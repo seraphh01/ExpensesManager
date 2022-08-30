@@ -11,15 +11,16 @@ class TransactionsListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Flexible(
       fit: FlexFit.loose,
-      child: SingleChildScrollView(
-        child: Column(
-          children: transactions.map((e) => transactionCard(e)).toList(),
-        ),
+      child: ListView.builder(
+        itemBuilder: (context, index) {
+          return transactionCard(context, transactions[index]);
+        },
+        itemCount: transactions.length,
       ),
     );
   }
 
-  Widget transactionCard(Transaction transaction) {
+  Widget transactionCard(BuildContext context, Transaction transaction) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20),
       child: Card(
@@ -35,13 +36,14 @@ class TransactionsListView extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green, width: 3)),
+                    border: Border.all(
+                        color: Theme.of(context).primaryColor, width: 3)),
                 child: Text(
-                  "\$${transaction.amount}",
-                  style: const TextStyle(
+                  "\$${transaction.amount.toStringAsFixed(2)}",
+                  style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
-                      color: Colors.green),
+                      color: Theme.of(context).primaryColor),
                 ),
               ),
               const SizedBox(width: 20),
@@ -50,8 +52,7 @@ class TransactionsListView extends StatelessWidget {
                 children: [
                   Text(
                     transaction.title,
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   Text(DateFormat.yMEd().format(transaction.dateTime),
                       style: const TextStyle(

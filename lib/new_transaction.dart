@@ -1,16 +1,20 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_debugging/transaction.dart';
 
-class NewTransactionForm extends StatelessWidget {
-  final titleController = TextEditingController();
-  final amountController = TextEditingController();
+class NewTransactionForm extends StatefulWidget {
   final Function(Transaction) addTransaction;
 
   NewTransactionForm({Key? key, required this.addTransaction})
       : super(key: key);
+
+  @override
+  State<NewTransactionForm> createState() => _NewTransactionFormState();
+}
+
+class _NewTransactionFormState extends State<NewTransactionForm> {
+  final titleController = TextEditingController();
+
+  final amountController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -26,26 +30,42 @@ class NewTransactionForm extends StatelessWidget {
             children: [
               TextField(
                   controller: titleController,
-                  decoration: const InputDecoration(label: Text("Title"))),
+                  decoration: const InputDecoration(label: Text("Title")),
+                  keyboardType: TextInputType.text,
+                  onSubmitted: (_) => submitAddTransaction()),
               TextField(
-                controller: amountController,
-                decoration: const InputDecoration(label: Text("Amount")),
-              ),
+                  controller: amountController,
+                  decoration: const InputDecoration(label: Text("Amount")),
+                  keyboardType: TextInputType.number,
+                  onSubmitted: (_) => submitAddTransaction()),
               TextButton(
-                  onPressed: () {
-                    var newTransaction = Transaction(
-                        id: "id",
-                        title: titleController.text,
-                        amount: double.parse(amountController.text),
-                        dateTime: DateTime.now());
-
-                    addTransaction(newTransaction);
-                  },
+                  onPressed: submitAddTransaction,
                   child: const Text("Add transaction"))
             ],
           ),
         ),
       ),
     );
+  }
+
+  void submitAddTransaction() {
+    try {
+      final title = titleController.text;
+      final amount = double.parse(amountController.text);
+
+      if (title.isEmpty || amount <= 0) {
+        return;
+      }
+
+      var newTransaction = Transaction(
+          id: "id",
+          title: titleController.text,
+          amount: double.parse(amountController.text),
+          dateTime: DateTime.now());
+      widget.addTransaction(newTransaction);
+      Navigator.of(context).pop();
+    } catch (ex) {
+      return;
+    }
   }
 }
